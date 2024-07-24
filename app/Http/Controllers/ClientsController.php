@@ -9,11 +9,12 @@ class ClientsController extends Controller
 {
     public function index()
     {
-        $clients = Client::all();
+        /** @var \App\User $user */
+        $user = auth()->user();
 
-        foreach ($clients as $client) {
-            $client->append('bookings_count');
-        }
+        abort_if(!$user, 403);
+
+        $clients = $user->clients;
 
         return view('clients.index', ['clients' => $clients]);
     }
