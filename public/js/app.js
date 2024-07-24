@@ -2081,6 +2081,25 @@ __webpack_require__.r(__webpack_exports__);
     },
     deleteBooking: function deleteBooking(booking) {
       axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"]("/bookings/".concat(booking.id));
+    },
+    formatDate: function formatDate(start, end) {
+      var startDate = new Date(start);
+      var endDate = new Date(end);
+      var options = {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      var formattedStartDate = new Intl.DateTimeFormat('en-GB', options).format(startDate);
+      var timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      var formattedEndDate = new Intl.DateTimeFormat('en-GB', timeOptions).format(endDate);
+      return "".concat(formattedStartDate, " to ").concat(formattedEndDate);
     }
   }
 });
@@ -38147,9 +38166,9 @@ var render = function() {
                             return _c("tr", { key: booking.id }, [
                               _c("td", [
                                 _vm._v(
-                                  _vm._s(booking.start) +
-                                    " - " +
-                                    _vm._s(booking.end)
+                                  _vm._s(
+                                    _vm.formatDate(booking.start, booking.end)
+                                  )
                                 )
                               ]),
                               _vm._v(" "),
@@ -50963,8 +50982,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/arunas/Sites/tech-challenge/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/arunas/Sites/tech-challenge/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Volumes/Projects/tech-challenge/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Volumes/Projects/tech-challenge/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
