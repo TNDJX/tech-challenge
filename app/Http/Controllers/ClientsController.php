@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Client;
 use App\Http\Requests\StoreClientRequest;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ClientsController extends Controller
 {
@@ -26,8 +27,16 @@ class ClientsController extends Controller
 
     public function show($client)
     {
+        /**
+         * TODO: Question re bookings orders do we want newest first as in the readme?
+         *  or we would like to see bookings ordered by their start date
+         */
         $client = Client::where('id', $client)
-            ->with('bookings')
+            ->with([
+                'bookings' => function (HasMany $query) {
+                    $query->latest();
+                }
+            ])
             ->first();
 
         return view('clients.show', ['client' => $client]);
