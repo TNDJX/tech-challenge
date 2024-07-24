@@ -32,17 +32,17 @@
             <div class="w-2/3">
                 <div>
                     <button class="btn"
-                            :class="{'btn-primary': currentTab === 'bookings', 'btn-default': currentTab !== 'bookings'}"
+                            :class="{'btn-primary': isBookingsTab, 'btn-default': !isBookingsTab}"
                             @click="switchTab('bookings')">Bookings
                     </button>
                     <button class="btn"
-                            :class="{'btn-primary': currentTab === 'journals', 'btn-default': currentTab !== 'journals'}"
+                            :class="{'btn-primary': isJournalsTab, 'btn-default': !isJournalsTab}"
                             @click="switchTab('journals')">Journals
                     </button>
                 </div>
 
                 <!-- Bookings -->
-                <div class="bg-white rounded p-4" v-if="currentTab === 'bookings'">
+                <div class="bg-white rounded p-4" v-if="isBookingsTab">
                     <h3 class="mb-3">List of client bookings</h3>
                     <select v-model="filter" class="ring-2 my-2">
                         <option v-for="option in filterOptions" :key="option">{{ option }}</option>
@@ -76,10 +76,35 @@
                 </div>
 
                 <!-- Journals -->
-                <div class="bg-white rounded p-4" v-if="currentTab === 'journals'">
+                <div class="bg-white rounded p-4" v-if="isJournalsTab">
                     <h3 class="mb-3">List of client journals</h3>
+                    <!-- Add journal form -->
+                    <journal-form :client="client" @journal-created="fetchJournals" />
+                    <template v-if="journals.length > 0">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Content</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="journal in journals" :key="journal.id">
+                                <td>{{ journal.date }}</td>
+                                <td>{{ journal.content }}</td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" @click="deleteJournal(journal)">Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </template>
 
-                    <p>(BONUS) TODO: implement this feature</p>
+                    <template v-else>
+                        <p class="text-center">The client has no journals.</p>
+                    </template>
                 </div>
             </div>
         </div>
@@ -88,9 +113,11 @@
 
 <script>
 import axios from 'axios';
+import JournalForm from './JournalForm.vue';
 
 export default {
     name: 'ClientShow',
+    components: {JournalForm},
 
     props: ['client'],
 
@@ -98,7 +125,8 @@ export default {
         return {
             currentTab: 'bookings',
             filter: 'All bookings',
-            filterOptions: ['All bookings', 'Future bookings only', 'Past bookings only']
+            filterOptions: ['All bookings', 'Future bookings only', 'Past bookings only'],
+            journals: []
         }
     },
 
@@ -113,26 +141,55 @@ export default {
                 return this.client.bookings.filter(booking => new Date(booking.start) < now);
             }
             return this.client.bookings;
+        },
+        isBookingsTab() {
+            return this.currentTab === 'bookings';
+        },
+        isJournalsTab() {
+            return this.currentTab === 'journals';
         }
     },
 
     methods: {
         switchTab(newTab) {
             this.currentTab = newTab;
+            if (this.isJournalsTab) {
+                this.fetchJournals();
+            }
         },
 
         deleteBooking(booking) {
             axios.delete(`/bookings/${booking.id}`);
         },
 
+        deleteJournal(journal) {
+            axios.delete(`/clients/${this.client.id}/journals/${journal.id}`).then(() => {
+                this.journals = this.journals.filter(j => j.id !== journal.id);
+            })
+        },
+
+        fetchJournals() {
+            axios.get(`/clients/${this.client.id}/journals`)
+                .then(response => {
+                    this.journals = response.data?.data;
+                });
+        },
+
         formatDate(start, end) {
             const startDate = new Date(start);
             const endDate = new Date(end);
 
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const options = {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
             const formattedStartDate = new Intl.DateTimeFormat('en-GB', options).format(startDate);
 
-            const timeOptions = { hour: '2-digit', minute: '2-digit' };
+            const timeOptions = {hour: '2-digit', minute: '2-digit'};
             const formattedEndDate = new Intl.DateTimeFormat('en-GB', timeOptions).format(endDate);
 
             return `${formattedStartDate} to ${formattedEndDate}`;

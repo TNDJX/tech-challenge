@@ -27,6 +27,7 @@ class ClientsController extends Controller
 
     public function show($client)
     {
+        $user = auth()->id();
         /**
          * TODO: Question re bookings orders do we want newest first as in the readme?
          *  or we would like to see bookings ordered by their start date
@@ -38,6 +39,8 @@ class ClientsController extends Controller
                 }
             ])
             ->first();
+
+        abort_if($client->user_id !== $user, 403);
 
         return view('clients.show', ['client' => $client]);
     }
@@ -63,6 +66,6 @@ class ClientsController extends Controller
         Client::where('id', $client)
             ->delete();
 
-        return 'Deleted';
+        return response()->noContent();
     }
 }

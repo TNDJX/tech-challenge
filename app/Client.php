@@ -43,6 +43,16 @@ class Client extends Model
     }
 
     /**
+     * Get Journals relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function journals(): HasMany
+    {
+        return $this->hasMany(Journal::class);
+    }
+
+    /**
      * Relationship with the User model.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
