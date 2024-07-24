@@ -30,7 +30,7 @@ class JournalTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonFragment([
             'id' => $journal->id,
-            'date' => $journal->date,
+            'date' => $journal->date->format('Y-m-d'),
             'content' => $journal->content,
         ]);
     }
@@ -46,7 +46,7 @@ class JournalTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonFragment([
-            'date' => $journal->date,
+            'date' => $journal->date->format('Y-m-d'),
             'content' => $journal->content,
         ]);
     }
