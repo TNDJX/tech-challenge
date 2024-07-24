@@ -2083,14 +2083,43 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ClientShow',
   props: ['client'],
   data: function data() {
     return {
-      currentTab: 'bookings'
+      currentTab: 'bookings',
+      filter: 'All bookings',
+      filterOptions: ['All bookings', 'Future bookings only', 'Past bookings only']
     };
+  },
+  computed: {
+    filteredBookings: function filteredBookings() {
+      if (!this.client.bookings) return [];
+      var now = new Date();
+
+      if (this.filter === 'Future bookings only') {
+        return this.client.bookings.filter(function (booking) {
+          return new Date(booking.start) > now;
+        });
+      } else if (this.filter === 'Past bookings only') {
+        return this.client.bookings.filter(function (booking) {
+          return new Date(booking.start) < now;
+        });
+      }
+
+      return this.client.bookings;
+    }
   },
   methods: {
     switchTab: function switchTab(newTab) {
@@ -38195,8 +38224,8 @@ var render = function() {
             {
               staticClass: "btn",
               class: {
-                "btn-primary": _vm.currentTab == "bookings",
-                "btn-default": _vm.currentTab != "bookings"
+                "btn-primary": _vm.currentTab === "bookings",
+                "btn-default": _vm.currentTab !== "bookings"
               },
               on: {
                 click: function($event) {
@@ -38204,7 +38233,7 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("Bookings")]
+            [_vm._v("Bookings\n                ")]
           ),
           _vm._v(" "),
           _c(
@@ -38212,8 +38241,8 @@ var render = function() {
             {
               staticClass: "btn",
               class: {
-                "btn-primary": _vm.currentTab == "journals",
-                "btn-default": _vm.currentTab != "journals"
+                "btn-primary": _vm.currentTab === "journals",
+                "btn-default": _vm.currentTab !== "journals"
               },
               on: {
                 click: function($event) {
@@ -38221,11 +38250,11 @@ var render = function() {
                 }
               }
             },
-            [_vm._v("Journals")]
+            [_vm._v("Journals\n                ")]
           )
         ]),
         _vm._v(" "),
-        _vm.currentTab == "bookings"
+        _vm.currentTab === "bookings"
           ? _c(
               "div",
               { staticClass: "bg-white rounded p-4" },
@@ -38234,14 +38263,50 @@ var render = function() {
                   _vm._v("List of client bookings")
                 ]),
                 _vm._v(" "),
-                _vm.client.bookings && _vm.client.bookings.length > 0
+                _c(
+                  "select",
+                  {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.filter,
+                        expression: "filter"
+                      }
+                    ],
+                    staticClass: "ring-2 my-2",
+                    on: {
+                      change: function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.filter = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      }
+                    }
+                  },
+                  _vm._l(_vm.filterOptions, function(option) {
+                    return _c("option", { key: option }, [
+                      _vm._v(_vm._s(option))
+                    ])
+                  }),
+                  0
+                ),
+                _vm._v(" "),
+                _vm.filteredBookings.length > 0
                   ? [
                       _c("table", [
                         _vm._m(0),
                         _vm._v(" "),
                         _c(
                           "tbody",
-                          _vm._l(_vm.client.bookings, function(booking) {
+                          _vm._l(_vm.filteredBookings, function(booking) {
                             return _c("tr", { key: booking.id }, [
                               _c("td", [
                                 _vm._v(
@@ -38264,7 +38329,11 @@ var render = function() {
                                       }
                                     }
                                   },
-                                  [_vm._v("Delete")]
+                                  [
+                                    _vm._v(
+                                      "Delete\n                                "
+                                    )
+                                  ]
                                 )
                               ])
                             ])
@@ -38283,7 +38352,7 @@ var render = function() {
             )
           : _vm._e(),
         _vm._v(" "),
-        _vm.currentTab == "journals"
+        _vm.currentTab === "journals"
           ? _c("div", { staticClass: "bg-white rounded p-4" }, [
               _c("h3", { staticClass: "mb-3" }, [
                 _vm._v("List of client journals")
