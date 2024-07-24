@@ -6,14 +6,17 @@
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" class="form-control" v-model="client.name">
+                <input-error :errors="errors.name" />
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="text" id="email" class="form-control" v-model="client.email">
+                <input-error :errors="errors.email" />
             </div>
             <div class="form-group">
                 <label for="phone">Phone</label>
                 <input type="text" id="phone" class="form-control" v-model="client.phone">
+                <input-error :errors="errors.phone" />
             </div>
             <div class="form-group">
                 <label for="name">Address</label>
@@ -40,9 +43,11 @@
 
 <script>
 import axios from 'axios';
+import InputError from './InputError.vue';
 
 export default {
     name: 'ClientForm',
+    components: {InputError},
 
     data() {
         return {
@@ -53,7 +58,8 @@ export default {
                 address: '',
                 city: '',
                 postcode: '',
-            }
+            },
+            errors: {}
         }
     },
 
@@ -62,6 +68,11 @@ export default {
             axios.post('/clients', this.client)
                 .then((data) => {
                     window.location.href = data.data.url;
+                }).catch((error) => {
+                  const response = error.response;
+                  if (response.status === 422) {
+                        this.errors = response.data.errors || {};
+                    }
                 });
         }
     }
