@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Booking extends Model
 {
@@ -13,8 +14,16 @@ class Booking extends Model
         'notes',
     ];
 
-    protected $dates = [
-        'start',
-        'end',
+    protected $casts = [
+        'start' => 'datetime',
+        'end' => 'datetime',
     ];
+
+    /**
+     * Get the client that owns the booking.
+     */
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 }

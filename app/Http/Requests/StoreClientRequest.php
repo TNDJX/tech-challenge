@@ -15,8 +15,11 @@ class StoreClientRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:190',
-            'email' => 'required_without:phone|nullable|email',
-            'phone' => 'required_without:email|nullable|regex:/^[\d\s\+]+$/',
+            'email' => 'required_without:phone|nullable|email|max:255',
+            'phone' => 'required_without:email|nullable|regex:/^[\d\s\+]+$/|max:255',
+            'address' => 'sometimes|nullable|string|max:255',
+            'city' => 'sometimes|nullable|string|max:255',
+            'postcode' => 'sometimes|nullable|string|max:255',
         ];
     }
 
