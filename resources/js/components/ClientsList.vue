@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="client in clients" :key="client.id">
+                <tr v-for="client in availableClients" :key="client.id">
                     <td>{{ client.name }}</td>
                     <td>{{ client.email }}</td>
                     <td>{{ client.phone }}</td>
@@ -39,9 +39,21 @@ export default {
 
     props: ['clients'],
 
+    data() {
+        return {
+          availableClients: []
+        }
+    },
+
+    mounted() {
+        // Store clients in availableClients to allow filtering
+        this.availableClients = this.clients;
+    },
+
     methods: {
         deleteClient(client) {
             axios.delete(`/clients/${client.id}`);
+            this.availableClients = this.availableClients.filter(c => c.id !== client.id);
         }
     }
 }
